@@ -26,6 +26,8 @@ public class ValidatorController {
         this.listener = validatorListener;
     }
 
+    /** call this method to download company's data.
+     * Params: url */
     public void downloadCompanyInfo(String url){
         JsonObjectRequest jsObjRequest = new JsonObjectRequest
                 (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -50,6 +52,7 @@ public class ValidatorController {
         VolleySingleton.getInstance(context).addToRequestQueue(jsObjRequest);
     }
 
+    /** read company json data, create the model and pass it to MainActivity */
     private void manageCompanyInfo(JSONObject info){
         try {
             Company company = new Company();

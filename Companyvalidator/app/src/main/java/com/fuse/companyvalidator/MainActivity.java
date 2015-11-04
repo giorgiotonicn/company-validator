@@ -65,10 +65,12 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
         initValidator();
     }
 
+    /** init Validator controller with context and listener to download and manage company data */
     private void initValidator(){
         validatorController = new ValidatorController(this, this);
     }
 
+    /** check if the url length is > of 1 and delete spaces than send request to server */
     private void manageUrlAndSendRequest(String companyName){
         if(companyName.length() < 1){
             return;
@@ -83,6 +85,8 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
         validatorController.downloadCompanyInfo(url);
     }
 
+    /** method called from controller to notify that server response is 200
+     * so we change color of editText to green */
     @Override
     public void onValidatorOK() {
         hideProgressDialog();
@@ -94,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
         this.cancelable = true;
     }
 
+    /** method called from controller to notify that server response is error. We change color of editText to red */
     @Override
     public void onValidatorError() {
         hideProgressDialog();
@@ -105,12 +110,14 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
         this.cancelable = true;
     }
 
+    /** method called from controller to notify that we have read the company information and set them to UI */
     @Override
     public void onCompanyInfoLoaded(Company companyInfo) {
         Picasso.with(this).load(companyInfo.getLogo()).into(this.companyImageView);
         this.editText.setText(companyInfo.getName());
     }
 
+    /** method called from controller. We have read the company information and set them to UI */
     private void resetCompanyInfo(){
         this.companyImageView.setImageBitmap(null);
         if(Build.VERSION.SDK_INT >= 16) {
