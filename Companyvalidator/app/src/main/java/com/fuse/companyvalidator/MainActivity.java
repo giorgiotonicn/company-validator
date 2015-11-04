@@ -35,8 +35,7 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_GO) {
-                    showProgressDialog();
-                    validatorController.downloadCompanyInfo("https://" + editText.getText() + VALIDATOR_URL);
+                    manageUrlAndSendRequest(editText.getText().toString());
                 }
                 return false;
             }
@@ -53,6 +52,17 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
         validatorController = new ValidatorController(this, this);
     }
 
+    private void manageUrlAndSendRequest(String companyName){
+        if(companyName.length() < 1){
+            return;
+        }
+        
+        showProgressDialog();
+        if(companyName.contains(" ")){
+            companyName = companyName.replace(" ", "");
+        }
+        validatorController.downloadCompanyInfo("https://" + companyName + VALIDATOR_URL);
+    }
 
     @Override
     public void onValidatorOK() {
