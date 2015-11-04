@@ -1,6 +1,8 @@
 package com.fuse.companyvalidator;
 
 import android.app.ProgressDialog;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -25,6 +27,8 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
     private EditText editText;
     private ImageView companyImageView;
     private ProgressDialog progressDialog;
+    private Drawable editTextBg;
+    private boolean cancelable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
 
         this.companyImageView = (ImageView) findViewById(R.id.imageCompany);
         this.editText = (EditText) findViewById(R.id.editTextCompany);
+        this.editTextBg = this.editText.getBackground();
         this.editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -46,7 +51,9 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                resetCompanyInfo();
+                if(cancelable) {
+                    resetCompanyInfo();
+                }
                 return false;
             }
         });
@@ -79,13 +86,23 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
     @Override
     public void onValidatorOK() {
         hideProgressDialog();
-        this.editText.setBackgroundColor(getResources().getColor(android.R.color.holo_green_dark));
+        if(Build.VERSION.SDK_INT >= 23) {
+            this.editText.setBackgroundColor(getResources().getColor(R.color.colorGreen, getTheme()));
+        }else {
+            this.editText.setBackgroundColor(getResources().getColor(R.color.colorGreen));
+        }
+        this.cancelable = true;
     }
 
     @Override
     public void onValidatorError() {
         hideProgressDialog();
-        this.editText.setBackgroundColor(getResources().getColor(android.R.color.holo_red_dark));
+        if(Build.VERSION.SDK_INT >= 23) {
+            this.editText.setBackgroundColor(getResources().getColor(R.color.colorRed, getTheme()));
+        }else {
+            this.editText.setBackgroundColor(getResources().getColor(R.color.colorRed));
+        }
+        this.cancelable = true;
     }
 
     @Override
@@ -96,8 +113,13 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
 
     private void resetCompanyInfo(){
         this.companyImageView.setImageBitmap(null);
-        this.editText.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        if(Build.VERSION.SDK_INT >= 16) {
+            this.editText.setBackground(this.editTextBg);
+        }else {
+            this.editText.setBackgroundDrawable(this.editTextBg);
+        }
         this.editText.getText().clear();
+        this.cancelable = false;
     }
 
     private void showProgressDialog(){
