@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.fuse.companyvalidator.controller.ValidatorController;
 import com.fuse.companyvalidator.listener.ValidatorListener;
 import com.fuse.companyvalidator.model.Company;
+import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity implements ValidatorListener{
 
@@ -67,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
 
     @Override
     public void onCompanyInfoLoaded(Company companyInfo) {
-        //TODO visualize the image
+        Picasso.with(this).load(companyInfo.getLogo()).into(this.companyImageView);
         this.editText.setText(companyInfo.getName());
     }
 
