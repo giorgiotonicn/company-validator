@@ -4,6 +4,8 @@ import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -16,7 +18,7 @@ import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity implements ValidatorListener{
 
-    private static final String VALIDATOR_URL = ".fusion-universal.com/api/v1/company.json";
+    private static final String VALIDATOR_URL = "https://%d.fusion-universal.com/api/v1/company.json";
 
     private ValidatorController validatorController;
 
@@ -40,6 +42,14 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
                 return false;
             }
         });
+        this.editText.setOnTouchListener(new View.OnTouchListener() {
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                resetCompanyInfo();
+                return false;
+            }
+        });
     }
 
     @Override
@@ -56,12 +66,14 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
         if(companyName.length() < 1){
             return;
         }
-        
+
         showProgressDialog();
         if(companyName.contains(" ")){
             companyName = companyName.replace(" ", "");
         }
-        validatorController.downloadCompanyInfo("https://" + companyName + VALIDATOR_URL);
+        String url = VALIDATOR_URL;
+        url = url.replace("%d", companyName);
+        validatorController.downloadCompanyInfo(url);
     }
 
     @Override
@@ -80,6 +92,12 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
     public void onCompanyInfoLoaded(Company companyInfo) {
         Picasso.with(this).load(companyInfo.getLogo()).into(this.companyImageView);
         this.editText.setText(companyInfo.getName());
+    }
+
+    private void resetCompanyInfo(){
+        this.companyImageView.setImageBitmap(null);
+        this.editText.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        this.editText.getText().clear();
     }
 
     private void showProgressDialog(){
