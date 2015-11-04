@@ -3,7 +3,10 @@ package com.fuse.companyvalidator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+import com.fuse.companyvalidator.listener.ValidatorListener;
+import com.fuse.companyvalidator.model.Company;
+
+public class MainActivity extends AppCompatActivity implements ValidatorListener{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -12,4 +15,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onValidatorOK() {
+
+    }
+
+    @Override
+    public void onValidatorError() {
+
+    }
+
+    @Override
+    public void onCompanyInfoLoaded(Company companyInfo) {
+
+    }
 }
