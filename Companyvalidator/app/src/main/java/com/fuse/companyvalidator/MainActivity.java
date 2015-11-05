@@ -1,9 +1,11 @@
 package com.fuse.companyvalidator;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -16,11 +18,14 @@ import android.widget.TextView;
 import com.fuse.companyvalidator.controller.ValidatorController;
 import com.fuse.companyvalidator.listener.ValidatorListener;
 import com.fuse.companyvalidator.model.Company;
+import com.fuse.companyvalidator.utils.Utility;
 import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity implements ValidatorListener{
 
     private static final String VALIDATOR_URL = "https://%d.fusion-universal.com/api/v1/company.json";
+
+    private static final int CONNECTION_ERROR_DIALOG = 1;
 
     private ValidatorController validatorController;
 
@@ -51,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(cancelable) {
+                if (cancelable) {
                     resetCompanyInfo();
                 }
                 return false;
@@ -70,19 +75,23 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
         validatorController = new ValidatorController(this, this);
     }
 
-    /** check if the url length is > of 1 and delete spaces than send request to server */
+    /** check if is connected and then the url length > of 1 and delete spaces than send request to server, else show error connection dialog */
     private void manageUrlAndSendRequest(String companyName){
-        if(companyName.length() < 1){
-            return;
-        }
+        if(Utility.isConnected(this)) {
+            if (companyName.length() < 1) {
+                return;
+            }
 
-        showProgressDialog();
-        if(companyName.contains(" ")){
-            companyName = companyName.replace(" ", "");
+            showProgressDialog();
+            if (companyName.contains(" ")) {
+                companyName = companyName.replace(" ", "");
+            }
+            String url = VALIDATOR_URL;
+            url = url.replace("%d", companyName);
+            validatorController.downloadCompanyInfo(url);
+        }else{
+            showAlert(CONNECTION_ERROR_DIALOG);
         }
-        String url = VALIDATOR_URL;
-        url = url.replace("%d", companyName);
-        validatorController.downloadCompanyInfo(url);
     }
 
     /** method called from controller to notify that server response is 200
@@ -140,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
                 public void run() {
                     progressDialog = new ProgressDialog(MainActivity.this);
                     progressDialog.setIndeterminate(true);
-                    progressDialog.setMessage("Loading...");
+                    progressDialog.setMessage(getResources().getString(R.string.progress_msg));
                     progressDialog.show();
                 }
             });
@@ -150,6 +159,23 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
     private void hideProgressDialog(){
         if(this.progressDialog != null){
             this.progressDialog.dismiss();
+        }
+    }
+
+    private void showAlert(int id){
+        switch (id){
+            case CONNECTION_ERROR_DIALOG:
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setTitle(getResources().getString(R.string.alert_connection_error_title));
+                alertDialog.setMessage(getResources().getString(R.string.alert_connection_error_msg));
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+                break;
         }
     }
 }
