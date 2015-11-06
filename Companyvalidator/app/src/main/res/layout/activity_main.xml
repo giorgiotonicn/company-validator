@@ -19,7 +19,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:singleLine="true"
-            android:imeOptions="actionGo"/>
+            android:imeOptions="actionGo"
+            android:hint="@string/edit_hint"/>
     </FrameLayout>
 
     <FrameLayout
