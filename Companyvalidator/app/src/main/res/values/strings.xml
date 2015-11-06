@@ -3,4 +3,6 @@
     <string name="progress_msg">Loading...</string>
     <string name="alert_connection_error_title">No internet connection found</string>
     <string name="alert_connection_error_msg">Please verify and retry.</string>
+    <string name="alert_company_length_error_title">Attention!</string>
+    <string name="alert_company_length_error_msg">The name inserted is not valid.</string>
 </resources>

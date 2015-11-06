@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
     private static final String VALIDATOR_URL = "https://%d.fusion-universal.com/api/v1/company.json";
 
     private static final int CONNECTION_ERROR_DIALOG = 1;
+    private static final int COMPANY_NAME_LENGTH_ERROR = 2;
 
     private ValidatorController validatorController;
 
@@ -75,17 +76,18 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
         validatorController = new ValidatorController(this, this);
     }
 
-    /** check if is connected and then the url length > of 1 and delete spaces than send request to server, else show error connection dialog */
+    /** check if is connected, and then if the url contains spaces and is not empty than send the request to server, else show error connection dialog */
     private void manageUrlAndSendRequest(String companyName){
         if(Utility.isConnected(this)) {
-            if (companyName.length() < 1) {
+            if(!companyName.isEmpty() && companyName.contains(" ")){
+                companyName = companyName.replace(" ", "");
+            }
+            if (companyName.isEmpty()) {
+                showAlert(COMPANY_NAME_LENGTH_ERROR);
                 return;
             }
 
             showProgressDialog();
-            if (companyName.contains(" ")) {
-                companyName = companyName.replace(" ", "");
-            }
             String url = VALIDATOR_URL;
             url = url.replace("%d", companyName);
             validatorController.downloadCompanyInfo(url);
@@ -165,16 +167,29 @@ public class MainActivity extends AppCompatActivity implements ValidatorListener
     private void showAlert(int id){
         switch (id){
             case CONNECTION_ERROR_DIALOG:
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                alertDialog.setTitle(getResources().getString(R.string.alert_connection_error_title));
-                alertDialog.setMessage(getResources().getString(R.string.alert_connection_error_msg));
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                AlertDialog alertConnectionError = new AlertDialog.Builder(MainActivity.this).create();
+                alertConnectionError.setTitle(getResources().getString(R.string.alert_connection_error_title));
+                alertConnectionError.setMessage(getResources().getString(R.string.alert_connection_error_msg));
+                alertConnectionError.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
                             }
                         });
-                alertDialog.show();
+                alertConnectionError.show();
+                break;
+            case COMPANY_NAME_LENGTH_ERROR:
+                AlertDialog alertNameLength = new AlertDialog.Builder(MainActivity.this).create();
+                alertNameLength.setTitle(getResources().getString(R.string.alert_company_length_error_title));
+                alertNameLength.setMessage(getResources().getString(R.string.alert_company_length_error_msg));
+                alertNameLength.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                editText.getText().clear();
+                                dialog.dismiss();
+                            }
+                        });
+                alertNameLength.show();
                 break;
         }
     }
